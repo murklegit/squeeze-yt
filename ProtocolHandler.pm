@@ -406,17 +406,23 @@ sub getNextTrack {
                             $log->debug("url_encoded_fmt_stream_map: $vars{url_encoded_fmt_stream_map}");
                         }
 
-			my $streams = uri_unescape($vars{url_encoded_fmt_stream_map});
-			my %stream_hash = ($streams) =~ m/itag=(.+?)&url=(.+?=.+?)(?=,itag.+?)/ig;
+                        for my $stream (split(/,/, $vars{url_encoded_fmt_stream_map})) {
+                            no strict 'subs';
+                            my %props = map { split(/=/, $_) } split(/&/, $stream);
 
-			# check streams in preferred id order
-			my @streamOrder = $prefs->get('prefer_lowbitrate') ? (5, 34) : (34, 35, 5);
+                            # check streams in preferred id order
+                            my @streamOrder = $prefs->get('prefer_lowbitrate') ? (5, 34) : (34, 35, 5);
 
-			for my $id (@streamOrder) {
-				if (my $stream = $stream_hash{$id}) {
-					push @streams, { url => uri_unescape($stream_hash{$id}), format => $id == 5 ? 'mp3' : 'aac' };
-				}
-			}
+                            for my $id (@streamOrder) {
+                                    if ($id == $props{itag}) {
+                                            my $url = uri_unescape($props{url});
+                                            $url .="&signature=$props{signature}";
+
+                                            push @streams, { url => $url, format => $id == 5 ? 'mp3' : 'aac' };
+                                    }
+                            }
+
+                        }
 
 			# play the first stream
 			if (my $streamInfo = shift @streams) {
