@@ -396,15 +396,15 @@ sub getNextTrack {
 				$vars{$k} = $v;
 			}
 
-            if (!defined $vars{url_encoded_fmt_stream_map}) {
-                # New web page layout uses HTML5 details
-                ($vars{url_encoded_fmt_stream_map}) = ($http->content =~ /\"url_encoded_fmt_stream_map\": \"(.*?)\"/);
+                        if (!defined $vars{url_encoded_fmt_stream_map}) {
+                            # New web page layout uses HTML5 details
+                            ($vars{url_encoded_fmt_stream_map}) = ($http->content =~ /\"url_encoded_fmt_stream_map\": \"(.*?)\"/);
 
-                # Replace known unicode characters
-                $vars{url_encoded_fmt_stream_map} =~ s/\\u0026/\&/g;
-                $vars{url_encoded_fmt_stream_map} =~ s/sig=/signature=/g;
-                $log->debug("url_encoded_fmt_stream_map: $vars{url_encoded_fmt_stream_map}");
-            }
+                            # Replace known unicode characters
+                            $vars{url_encoded_fmt_stream_map} =~ s/\\u0026/\&/g;
+                            $vars{url_encoded_fmt_stream_map} =~ s/sig=/signature=/g;
+                            $log->debug("url_encoded_fmt_stream_map: $vars{url_encoded_fmt_stream_map}");
+                        }
 
 			my $streams = uri_unescape($vars{url_encoded_fmt_stream_map});
 			my %stream_hash = ($streams) =~ m/itag=(.+?)&url=(.+?=.+?)(?=,itag.+?)/ig;
